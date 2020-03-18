@@ -96,6 +96,58 @@ function addDepartment() {
     });
 }
 
+//Define addRole function
+function addRole() {
+  const myChoices = [];
+  const departmentIdName = {};
+
+  availableDepartments();
+
+  const questions = [
+    {
+      name: "title",
+      type: "input",
+      message: "What is the job title/position?"
+    },
+    {
+      name: "salary",
+      type: "input",
+      message: "What is the salary for this position/title?"
+    },
+    {
+      name: "departmentID",
+      type: "list",
+      message: "Please select the department for this role?",
+      choices: myChoices
+    }
+  ];
+  //const availableD = availableDepartments();
+  //const departChoices = availableD.map();
+
+  //function to provide departments as choices and reference it ID to the role
+  function availableDepartments() {
+    let sql = "SELECT * FROM department";
+    connection.query(sql, async function(err, result) {
+      if (err) throw err;
+      for (let i = 0; i < result.length; i++) {
+        myChoices.push(result[i].name);
+        departmentIdName[result[i].name] = result[i].id;
+      }
+    });
+  }
+  //send data to the
+  inquirer.prompt(questions).then(function(answer) {
+    connection.query(
+      "INSERT INTO role (title, salary, department_id) VALUES (?,?,?)",
+      [answer.title, answer.salary, departmentIdName[answer.departmentID]],
+      function(err, result) {
+        if (err) throw err;
+        console.log("Role added! Next...");
+      }
+    );
+  });
+}
+
 //Define general View departments, roles, employees, employees by manager and the total utilized budget of a department function
 function view() {
   inquirer
