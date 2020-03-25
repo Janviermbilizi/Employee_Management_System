@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const util = require("util");
 const inquirer = require("inquirer");
 
 //create my sql connection
@@ -18,12 +19,55 @@ var connection = mysql.createConnection({
 
 //connect
 
-connection.connect(function(err) {
-  if (err) throw err;
-  interactWithDB();
-});
-
+connection.connect();
+connection.query = util.promisify(connection.query);
 //The app function
+interactWithDB();
+
+async function availableDepartments() {
+  let sql = "SELECT * FROM department";
+  const departments = await connection.query(sql);
+
+  const departmentChoices = departments.map(({ id, name }) => ({
+    name: name,
+    value: id
+  }));
+  return departmentChoices;
+}
+async function availableRole() {
+  let sql = "SELECT * FROM role";
+  const roles = await connection.query(sql);
+
+  const roleChoices = roles.map(({ id, title }) => ({
+    name: title,
+    value: id
+  }));
+  return roleChoices;
+}
+
+async function availableEmployees() {
+  let sql = "SELECT * FROM employee";
+  const employees = await connection.query(sql);
+
+  const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id
+  }));
+
+  return employeeChoices;
+}
+async function availableManager() {
+  let sql = "SELECT * FROM employee WHERE isManager=1";
+  const managers = await connection.query(sql);
+
+  const manChoices = managers.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id
+  }));
+
+  return manChoices;
+}
+
 function interactWithDB() {
   inquirer
     .prompt({
@@ -97,8 +141,8 @@ function addDepartment() {
 }
 
 //Define addRole function
-function addRole() {
-  const myChoices = [];
+async function addRole() {
+  let myChoices = [];
   const departmentIdName = {};
 
   availableDepartments();
@@ -146,6 +190,65 @@ function addRole() {
       }
     );
   });
+}
+//Define addEmployee function
+async function addEmployee() {
+  const roleIdTitle = {};
+  const managerId = {};
+  // cosnt myDepartments = await avaialbeDepartements()
+  const myRoleChoices = await availableRole();
+
+  const myManagerChoices = await availableManager();
+
+  const questions = [
+    {
+      name: "firstName",
+      type: "input",
+      message: "What the employee's first name?"
+    },
+    {
+      name: "lastName",
+      type: "input",
+      message: "What the employee's last name?"
+    },
+    {
+      name: "roleID",
+      type: "list",
+      message: "Please select the role/position for this employee?",
+      choices: myRoleChoices
+    },
+    {
+      name: "manager",
+      type: "confirm",
+      message: "Is this a manager or superviser position?"
+    },
+    {
+      name: "managerID",
+      type: "list",
+      message: "Please select the manager/superviser of this employee?",
+      choices: myManagerChoices
+    }
+  ];
+  //const availableD = availableDepartments();
+  //const departChoices = availableD.map();
+
+  //function to provide departments as choices and reference it ID to the role
+
+  //send data to the
+  const answer = await inquirer.prompt(questions);
+  const res = await connection.query(
+    "INSERT INTO employee (first_name, last_name, role_id, isManager, superviserORmanager_id) VALUES (?,?,?,?,?)",
+    [
+      answer.firstName,
+      answer.lastName,
+      answer.roleID,
+      answer.manager,
+      answer.managerID
+    ]
+  );
+  console.log(
+    `${answer.firstName} ${answer.lastName} was added as an employee. Next...`
+  );
 }
 
 //Define general View departments, roles, employees, employees by manager and the total utilized budget of a department function
@@ -233,4 +336,74 @@ function toDelete() {
           break;
       }
     });
+
+  async function deleteDepartments() {
+    let listOfDepartments = [];
+
+    listOfDepartments = await availableDepartments();
+
+    await inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message: "Which department would you like to delete",
+        choices: listOfDepartments
+      })
+      .then(function(answer) {
+        connection.query(
+          "DELETE FROM department WHERE id='?'",
+          answer.action,
+          function(err, result) {
+            if (err) throw err;
+            console.log(`${answer.action} was deleted..`);
+          }
+        );
+      });
+  }
+  async function deleteRoles() {
+    let myRoleChoices = [];
+
+    myRoleChoices = await availableRole();
+
+    await inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message: "Which role would you like to delete",
+        choices: myRoleChoices
+      })
+      .then(function(answer) {
+        connection.query(
+          "DELETE FROM role WHERE id='?'",
+          answer.action,
+          function(err, result) {
+            if (err) throw err;
+            console.log(`${answer.action} was deleted..`);
+          }
+        );
+      });
+  }
+  async function deleteEmployees() {
+    let Choices = [];
+
+    Choices = await availableEmployees;
+
+    await inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message: "Which employee would you like to delete",
+        choices: Choices
+      })
+      .then(function(answer) {
+        connection.query(
+          "DELETE FROM employee WHERE id='?'",
+          answer.action,
+          function(err, result) {
+            if (err) throw err;
+            console.log(`${answer.action} was deleted..`);
+          }
+        );
+      });
+  }
 }

@@ -22,6 +22,8 @@ CREATE TABLE employee (
   first_name VARCHAR(30),
   last_name VARCHAR(30),
   role_id INT NOT NULL,
-  manager_id INT, /*to hold reference to another employee that manager of the current employee. This field may be null if the employee has no manager*/
+  isManager BOOLEAN NOT NULL,
+  superviserORmanager_id INT,
+  /*to hold reference to another employee that manager of the current employee. This field may be null if the employee has no manager*/
   PRIMARY KEY (id)
 );
