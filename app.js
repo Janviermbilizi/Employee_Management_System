@@ -121,134 +121,133 @@ function add() {
           break;
       }
     });
-}
-
-//Define addDepartment function
-function addDepartment() {
-  inquirer
-    .prompt({
-      name: "action",
-      type: "input",
-      message: "What the name of the department?"
-    })
-    .then(function(answer) {
-      let sql = "INSERT INTO department (name) VALUES (?)";
-      connection.query(sql, answer.action, function(err, result) {
-        if (err) throw err;
-        console.log("Department added! Next...");
+  //Define addDepartment function
+  function addDepartment() {
+    inquirer
+      .prompt({
+        name: "action",
+        type: "input",
+        message: "What the name of the department?"
+      })
+      .then(function(answer) {
+        let sql = "INSERT INTO department (name) VALUES (?)";
+        connection.query(sql, answer.action, function(err, result) {
+          if (err) throw err;
+          console.log("Department added! Next...");
+        });
       });
-    });
-}
+  }
 
-//Define addRole function
-async function addRole() {
-  let myChoices = [];
-  const departmentIdName = {};
+  //Define addRole function
+  async function addRole() {
+    let myChoices = [];
+    const departmentIdName = {};
 
-  availableDepartments();
+    availableDepartments();
 
-  const questions = [
-    {
-      name: "title",
-      type: "input",
-      message: "What is the job title/position?"
-    },
-    {
-      name: "salary",
-      type: "input",
-      message: "What is the salary for this position/title?"
-    },
-    {
-      name: "departmentID",
-      type: "list",
-      message: "Please select the department for this role?",
-      choices: myChoices
-    }
-  ];
-  //const availableD = availableDepartments();
-  //const departChoices = availableD.map();
-
-  //function to provide departments as choices and reference it ID to the role
-  function availableDepartments() {
-    let sql = "SELECT * FROM department";
-    connection.query(sql, async function(err, result) {
-      if (err) throw err;
-      for (let i = 0; i < result.length; i++) {
-        myChoices.push(result[i].name);
-        departmentIdName[result[i].name] = result[i].id;
+    const questions = [
+      {
+        name: "title",
+        type: "input",
+        message: "What is the job title/position?"
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "What is the salary for this position/title?"
+      },
+      {
+        name: "departmentID",
+        type: "list",
+        message: "Please select the department for this role?",
+        choices: myChoices
       }
+    ];
+    //const availableD = availableDepartments();
+    //const departChoices = availableD.map();
+
+    //function to provide departments as choices and reference it ID to the role
+    function availableDepartments() {
+      let sql = "SELECT * FROM department";
+      connection.query(sql, async function(err, result) {
+        if (err) throw err;
+        for (let i = 0; i < result.length; i++) {
+          myChoices.push(result[i].name);
+          departmentIdName[result[i].name] = result[i].id;
+        }
+      });
+    }
+    //send data to the
+    inquirer.prompt(questions).then(function(answer) {
+      connection.query(
+        "INSERT INTO role (title, salary, department_id) VALUES (?,?,?)",
+        [answer.title, answer.salary, departmentIdName[answer.departmentID]],
+        function(err, result) {
+          if (err) throw err;
+          console.log("Role added! Next...");
+        }
+      );
     });
   }
-  //send data to the
-  inquirer.prompt(questions).then(function(answer) {
-    connection.query(
-      "INSERT INTO role (title, salary, department_id) VALUES (?,?,?)",
-      [answer.title, answer.salary, departmentIdName[answer.departmentID]],
-      function(err, result) {
-        if (err) throw err;
-        console.log("Role added! Next...");
+  //Define addEmployee function
+  async function addEmployee() {
+    const roleIdTitle = {};
+    const managerId = {};
+    // cosnt myDepartments = await avaialbeDepartements()
+    const myRoleChoices = await availableRole();
+
+    const myManagerChoices = await availableManager();
+
+    const questions = [
+      {
+        name: "firstName",
+        type: "input",
+        message: "What the employee's first name?"
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "What the employee's last name?"
+      },
+      {
+        name: "roleID",
+        type: "list",
+        message: "Please select the role/position for this employee?",
+        choices: myRoleChoices
+      },
+      {
+        name: "manager",
+        type: "confirm",
+        message: "Is this a manager or superviser position?"
+      },
+      {
+        name: "managerID",
+        type: "list",
+        message: "Please select the manager/superviser of this employee?",
+        choices: myManagerChoices
       }
+    ];
+    //const availableD = availableDepartments();
+    //const departChoices = availableD.map();
+
+    //function to provide departments as choices and reference it ID to the role
+
+    //send data to the
+    const answer = await inquirer.prompt(questions);
+    const res = await connection.query(
+      "INSERT INTO employee (first_name, last_name, role_id, isManager, superviserORmanager_id) VALUES (?,?,?,?,?)",
+      [
+        answer.firstName,
+        answer.lastName,
+        answer.roleID,
+        answer.manager,
+        answer.managerID
+      ]
     );
-  });
-}
-//Define addEmployee function
-async function addEmployee() {
-  const roleIdTitle = {};
-  const managerId = {};
-  // cosnt myDepartments = await avaialbeDepartements()
-  const myRoleChoices = await availableRole();
-
-  const myManagerChoices = await availableManager();
-
-  const questions = [
-    {
-      name: "firstName",
-      type: "input",
-      message: "What the employee's first name?"
-    },
-    {
-      name: "lastName",
-      type: "input",
-      message: "What the employee's last name?"
-    },
-    {
-      name: "roleID",
-      type: "list",
-      message: "Please select the role/position for this employee?",
-      choices: myRoleChoices
-    },
-    {
-      name: "manager",
-      type: "confirm",
-      message: "Is this a manager or superviser position?"
-    },
-    {
-      name: "managerID",
-      type: "list",
-      message: "Please select the manager/superviser of this employee?",
-      choices: myManagerChoices
-    }
-  ];
-  //const availableD = availableDepartments();
-  //const departChoices = availableD.map();
-
-  //function to provide departments as choices and reference it ID to the role
-
-  //send data to the
-  const answer = await inquirer.prompt(questions);
-  const res = await connection.query(
-    "INSERT INTO employee (first_name, last_name, role_id, isManager, superviserORmanager_id) VALUES (?,?,?,?,?)",
-    [
-      answer.firstName,
-      answer.lastName,
-      answer.roleID,
-      answer.manager,
-      answer.managerID
-    ]
-  );
-  console.log(
-    `${answer.firstName} ${answer.lastName} was added as an employee. Next...`
-  );
+    console.log(
+      `${answer.firstName} ${answer.lastName} was added as an employee. Next...`
+    );
+  }
 }
 
 //Define general View departments, roles, employees, employees by manager and the total utilized budget of a department function
@@ -269,15 +268,15 @@ function view() {
     .then(function(answer) {
       switch (answer.action) {
         case "Departments":
-          viewDepartments();
+          availableDepartments();
           break;
 
         case "Roles":
-          viewRoles();
+          availableRoles();
           break;
 
         case "Employees":
-          viewEmployees();
+          availableEmployee();
           break;
 
         case "Employees by manager":
@@ -289,6 +288,37 @@ function view() {
           break;
       }
     });
+
+  function availableDepartments() {
+    let sql = "SELECT * FROM department";
+    connection.query(sql, function(err, result) {
+      if (err) throw err;
+      for (let i = 0; i < result.length; i++) {
+        console.log(result[i].name);
+      }
+    });
+    connection.end();
+  }
+  function availableRoles() {
+    let sql = "SELECT * FROM role";
+    connection.query(sql, function(err, result) {
+      if (err) throw err;
+      for (let i = 0; i < result.length; i++) {
+        console.log(result[i].title);
+      }
+    });
+    connection.end();
+  }
+  function availableEmployee() {
+    let sql = "SELECT * FROM employee";
+    connection.query(sql, function(err, result) {
+      if (err) throw err;
+      for (let i = 0; i < result.length; i++) {
+        console.log(`${result[i].first_name} ${result[i].last_name}`);
+      }
+    });
+    connection.end();
+  }
 }
 
 //Define general Update employee's role and employee's manager function
@@ -311,6 +341,73 @@ function update() {
           break;
       }
     });
+
+  async function updateEmployeesRole() {
+    let Choices = [];
+    let myRoleChoices = [];
+
+    myRoleChoices = await availableRole();
+
+    Choices = await availableEmployees();
+
+    const answer = await inquirer.prompt([
+      {
+        name: "action",
+        type: "list",
+        message: "Which employee would you like to update",
+        choices: Choices
+      },
+      {
+        name: "newRole",
+        type: "list",
+        message: "What's the employee's new role",
+        choices: myRoleChoices
+      }
+    ]);
+
+    connection.query(
+      "UPDATE employee SET role_id ='?' WHERE id='?'",
+      [answer.newRole, answer.action],
+      function(err, result) {
+        if (err) throw err;
+        console.log(`${answer.action} was updated..`);
+      }
+    );
+    connection.end();
+  }
+  async function updateEmployeesManager() {
+    let Choices = [];
+    let myManagerChoices = [];
+
+    myManagerChoices = await availableManager();
+
+    Choices = await availableEmployees();
+
+    const answer = await inquirer.prompt([
+      {
+        name: "action",
+        type: "list",
+        message: "Which employee would you like to update",
+        choices: Choices
+      },
+      {
+        name: "newManager",
+        type: "list",
+        message: "What's the employee's new manager",
+        choices: myManagerChoices
+      }
+    ]);
+
+    connection.query(
+      "UPDATE employee SET superviserORmanager_id ='?' WHERE id='?'",
+      [answer.newManager, answer.action],
+      function(err, result) {
+        if (err) throw err;
+        console.log(`${answer.action} was updated..`);
+      }
+    );
+    connection.end();
+  }
 }
 
 function toDelete() {
@@ -358,6 +455,7 @@ function toDelete() {
             console.log(`${answer.action} was deleted..`);
           }
         );
+        connection.end();
       });
   }
   async function deleteRoles() {
@@ -378,9 +476,10 @@ function toDelete() {
           answer.action,
           function(err, result) {
             if (err) throw err;
-            console.log(`${answer.action} was deleted..`);
+            console.log(`deleted..`);
           }
         );
+        connection.end();
       });
   }
   async function deleteEmployees() {
@@ -401,9 +500,10 @@ function toDelete() {
           answer.action,
           function(err, result) {
             if (err) throw err;
-            console.log(`${answer.action} was deleted..`);
+            console.log(`deleted..`);
           }
         );
+        connection.end();
       });
   }
 }
