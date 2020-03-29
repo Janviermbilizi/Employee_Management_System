@@ -268,7 +268,7 @@ function view() {
     .then(function(answer) {
       switch (answer.action) {
         case "Departments":
-          availableDepartments();
+          availableDepartment();
           break;
 
         case "Roles":
@@ -289,7 +289,7 @@ function view() {
       }
     });
 
-  function availableDepartments() {
+  function availableDepartment() {
     let sql = "SELECT * FROM department";
     connection.query(sql, function(err, result) {
       if (err) throw err;
@@ -318,6 +318,61 @@ function view() {
       }
     });
     connection.end();
+  }
+
+  //function for viewing employees by their manager
+  async function viewEmployeesByManager() {
+    let managerChoices = [];
+
+    managerChoices = await availableManager();
+
+    await inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message: "Which manager would you like to view's employee(s)",
+        choices: managerChoices
+      })
+      .then(function(answer) {
+        connection.query(
+          "SELECT * FROM employee WHERE superviserORmanager_id='?'",
+          answer.action,
+          function(err, result) {
+            if (err) throw err;
+            for (let i = 0; i < result.length; i++) {
+              console.log(`${result[i].first_name} ${result[i].last_name}`);
+            }
+          }
+        );
+        connection.end();
+      });
+  }
+  //function for viewing a total utilized badget of a department
+  async function viewTheTotalUtilizedBudgetOfADepartment() {
+    let departmentChoices = [];
+
+    departmentChoices = await availableDepartments();
+
+    await inquirer
+      .prompt({
+        name: "action",
+        type: "list",
+        message:
+          "Which department would you like to view the total utilized budget",
+        choices: departmentChoices
+      })
+      .then(function(answer) {
+        connection.query(
+          "SELECT * FROM role WHERE department_id='?'",
+          answer.action,
+          function(err, result) {
+            if (err) throw err;
+            for (let i = 0; i < result.length; i++) {
+              console.log(result[i].salary);
+            }
+          }
+        );
+      });
   }
 }
 
