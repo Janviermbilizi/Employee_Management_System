@@ -137,6 +137,7 @@ function add() {
         connection.query(sql, answer.action, function (err, result) {
           if (err) throw err;
           console.log("Department added! Next...");
+          interactWithDB();
         });
       });
   }
@@ -188,6 +189,7 @@ function add() {
         function (err, result) {
           if (err) throw err;
           console.log("Role added! Next...");
+          interactWithDB();
         }
       );
     });
@@ -250,6 +252,7 @@ function add() {
     console.log(
       `${answer.firstName} ${answer.lastName} was added as an employee. Next...`
     );
+    interactWithDB();
   }
 }
 
@@ -298,9 +301,9 @@ function view() {
       if (err) throw err;
       for (let i = 0; i < result.length; i++) {
         console.log(result[i].name);
+        interactWithDB();
       }
     });
-    connection.end();
   }
   function availableRoles() {
     let sql = "SELECT * FROM role";
@@ -308,9 +311,9 @@ function view() {
       if (err) throw err;
       for (let i = 0; i < result.length; i++) {
         console.log(result[i].title);
+        interactWithDB();
       }
     });
-    connection.end();
   }
   function availableEmployee() {
     let sql = "SELECT * FROM employee";
@@ -318,9 +321,9 @@ function view() {
       if (err) throw err;
       for (let i = 0; i < result.length; i++) {
         console.log(`${result[i].first_name} ${result[i].last_name}`);
+        interactWithDB();
       }
     });
-    connection.end();
   }
 
   //function for viewing employees by their manager
@@ -344,10 +347,10 @@ function view() {
             if (err) throw err;
             for (let i = 0; i < result.length; i++) {
               console.log(`${result[i].first_name} ${result[i].last_name}`);
+              interactWithDB();
             }
           }
         );
-        connection.end();
       });
   }
   //function for viewing a total utilized badget of a department
@@ -373,6 +376,7 @@ function view() {
             console.log(
               `The total utilized budget for ${result[0].name} department is $${result[0].total}`
             );
+            interactWithDB();
           }
         );
       });
@@ -428,10 +432,10 @@ function update() {
       [answer.newRole, answer.action],
       function (err, result) {
         if (err) throw err;
-        console.log(`${answer.action} was updated..`);
+        console.log("updated! next...");
+        interactWithDB();
       }
     );
-    connection.end();
   }
   async function updateEmployeesManager() {
     let Choices = [];
@@ -461,10 +465,9 @@ function update() {
       [answer.newManager, answer.action],
       function (err, result) {
         if (err) throw err;
-        console.log(`${answer.action} was updated..`);
+        console.log("updated! next...");
       }
     );
-    connection.end();
   }
 }
 
@@ -510,10 +513,10 @@ function toDelete() {
           answer.action,
           function (err, result) {
             if (err) throw err;
-            console.log(`${answer.action} was deleted..`);
+            console.log("deleted!! next...");
+            interactWithDB();
           }
         );
-        connection.end();
       });
   }
   async function deleteRoles() {
@@ -534,10 +537,10 @@ function toDelete() {
           answer.action,
           function (err, result) {
             if (err) throw err;
-            console.log(`deleted..`);
+            console.log("deleted!! next...");
+            interactWithDB();
           }
         );
-        connection.end();
       });
   }
   async function deleteEmployees() {
@@ -558,10 +561,10 @@ function toDelete() {
           answer.action,
           function (err, result) {
             if (err) throw err;
-            console.log(`deleted..`);
+            console.log("deleted!! next...");
+            interactWithDB();
           }
         );
-        connection.end();
       });
   }
 }
