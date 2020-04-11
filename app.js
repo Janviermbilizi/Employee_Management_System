@@ -74,7 +74,7 @@ function interactWithDB() {
       name: "action",
       type: "rawlist",
       message: "What would you like to do?",
-      choices: ["Add", "View", "Update", "Delete"],
+      choices: ["Add", "View", "Update", "Delete", "Exit"],
     })
     .then(function (answer) {
       switch (answer.action) {
@@ -92,6 +92,9 @@ function interactWithDB() {
 
         case "Delete":
           toDelete();
+          break;
+        case "Exit":
+          process.exit();
           break;
       }
     });
@@ -368,7 +371,7 @@ function view() {
           function (err, result) {
             if (err) throw err;
             console.log(
-              `${result[0].name} Department Total Salary: $${result[0].total}`
+              `The total utilized budget for ${result[0].name} department is $${result[0].total}`
             );
           }
         );
@@ -562,8 +565,3 @@ function toDelete() {
       });
   }
 }
-
-// SELECT employee.id, role.id, role.title, salary, department.name
-// FROM ((role
-// INNER JOIN employee ON role.id = employee.role_id)
-// INNER JOIN department ON role.department_id = department.id);
