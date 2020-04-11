@@ -13,16 +13,16 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "Janvier1995@",
-  database: "company_DB"
+  password: "Janvier1995!",
+  database: "company_DB",
 });
 
 //connect
 
 connection.connect();
-connection.query = util.promisify(connection.query);
 //The app function
 interactWithDB();
+connection.query = util.promisify(connection.query);
 
 async function availableDepartments() {
   let sql = "SELECT * FROM department";
@@ -30,7 +30,7 @@ async function availableDepartments() {
 
   const departmentChoices = departments.map(({ id, name }) => ({
     name: name,
-    value: id
+    value: id,
   }));
   return departmentChoices;
 }
@@ -40,7 +40,7 @@ async function availableRole() {
 
   const roleChoices = roles.map(({ id, title }) => ({
     name: title,
-    value: id
+    value: id,
   }));
   return roleChoices;
 }
@@ -51,7 +51,7 @@ async function availableEmployees() {
 
   const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
     name: `${first_name} ${last_name}`,
-    value: id
+    value: id,
   }));
 
   return employeeChoices;
@@ -62,7 +62,7 @@ async function availableManager() {
 
   const manChoices = managers.map(({ id, first_name, last_name }) => ({
     name: `${first_name} ${last_name}`,
-    value: id
+    value: id,
   }));
 
   return manChoices;
@@ -74,9 +74,9 @@ function interactWithDB() {
       name: "action",
       type: "rawlist",
       message: "What would you like to do?",
-      choices: ["Add", "View", "Update", "Delete"]
+      choices: ["Add", "View", "Update", "Delete"],
     })
-    .then(function(answer) {
+    .then(function (answer) {
       switch (answer.action) {
         case "Add":
           add();
@@ -104,9 +104,9 @@ function add() {
       name: "action",
       type: "rawlist",
       message: "What would you like to add?",
-      choices: ["Department", "Role", "Employee"]
+      choices: ["Department", "Role", "Employee"],
     })
-    .then(function(answer) {
+    .then(function (answer) {
       switch (answer.action) {
         case "Department":
           addDepartment();
@@ -127,11 +127,11 @@ function add() {
       .prompt({
         name: "action",
         type: "input",
-        message: "What the name of the department?"
+        message: "What the name of the department?",
       })
-      .then(function(answer) {
+      .then(function (answer) {
         let sql = "INSERT INTO department (name) VALUES (?)";
-        connection.query(sql, answer.action, function(err, result) {
+        connection.query(sql, answer.action, function (err, result) {
           if (err) throw err;
           console.log("Department added! Next...");
         });
@@ -149,19 +149,19 @@ function add() {
       {
         name: "title",
         type: "input",
-        message: "What is the job title/position?"
+        message: "What is the job title/position?",
       },
       {
         name: "salary",
         type: "input",
-        message: "What is the salary for this position/title?"
+        message: "What is the salary for this position/title?",
       },
       {
         name: "departmentID",
         type: "list",
         message: "Please select the department for this role?",
-        choices: myChoices
-      }
+        choices: myChoices,
+      },
     ];
     //const availableD = availableDepartments();
     //const departChoices = availableD.map();
@@ -169,7 +169,7 @@ function add() {
     //function to provide departments as choices and reference it ID to the role
     function availableDepartments() {
       let sql = "SELECT * FROM department";
-      connection.query(sql, async function(err, result) {
+      connection.query(sql, async function (err, result) {
         if (err) throw err;
         for (let i = 0; i < result.length; i++) {
           myChoices.push(result[i].name);
@@ -178,11 +178,11 @@ function add() {
       });
     }
     //send data to the
-    inquirer.prompt(questions).then(function(answer) {
+    inquirer.prompt(questions).then(function (answer) {
       connection.query(
         "INSERT INTO role (title, salary, department_id) VALUES (?,?,?)",
         [answer.title, answer.salary, departmentIdName[answer.departmentID]],
-        function(err, result) {
+        function (err, result) {
           if (err) throw err;
           console.log("Role added! Next...");
         }
@@ -202,30 +202,30 @@ function add() {
       {
         name: "firstName",
         type: "input",
-        message: "What the employee's first name?"
+        message: "What the employee's first name?",
       },
       {
         name: "lastName",
         type: "input",
-        message: "What the employee's last name?"
+        message: "What the employee's last name?",
       },
       {
         name: "roleID",
         type: "list",
         message: "Please select the role/position for this employee?",
-        choices: myRoleChoices
+        choices: myRoleChoices,
       },
       {
         name: "manager",
         type: "confirm",
-        message: "Is this a manager or superviser position?"
+        message: "Is this a manager or superviser position?",
       },
       {
         name: "managerID",
         type: "list",
         message: "Please select the manager/superviser of this employee?",
-        choices: myManagerChoices
-      }
+        choices: myManagerChoices,
+      },
     ];
     //const availableD = availableDepartments();
     //const departChoices = availableD.map();
@@ -241,7 +241,7 @@ function add() {
         answer.lastName,
         answer.roleID,
         answer.manager,
-        answer.managerID
+        answer.managerID,
       ]
     );
     console.log(
@@ -262,10 +262,10 @@ function view() {
         "Roles",
         "Employees",
         "Employees by manager",
-        "The total utilized budget of a department"
-      ]
+        "The total utilized budget of a department",
+      ],
     })
-    .then(function(answer) {
+    .then(function (answer) {
       switch (answer.action) {
         case "Departments":
           availableDepartment();
@@ -291,7 +291,7 @@ function view() {
 
   function availableDepartment() {
     let sql = "SELECT * FROM department";
-    connection.query(sql, function(err, result) {
+    connection.query(sql, function (err, result) {
       if (err) throw err;
       for (let i = 0; i < result.length; i++) {
         console.log(result[i].name);
@@ -301,7 +301,7 @@ function view() {
   }
   function availableRoles() {
     let sql = "SELECT * FROM role";
-    connection.query(sql, function(err, result) {
+    connection.query(sql, function (err, result) {
       if (err) throw err;
       for (let i = 0; i < result.length; i++) {
         console.log(result[i].title);
@@ -311,7 +311,7 @@ function view() {
   }
   function availableEmployee() {
     let sql = "SELECT * FROM employee";
-    connection.query(sql, function(err, result) {
+    connection.query(sql, function (err, result) {
       if (err) throw err;
       for (let i = 0; i < result.length; i++) {
         console.log(`${result[i].first_name} ${result[i].last_name}`);
@@ -331,13 +331,13 @@ function view() {
         name: "action",
         type: "list",
         message: "Which manager would you like to view's employee(s)",
-        choices: managerChoices
+        choices: managerChoices,
       })
-      .then(function(answer) {
+      .then(function (answer) {
         connection.query(
           "SELECT * FROM employee WHERE superviserORmanager_id='?'",
           answer.action,
-          function(err, result) {
+          function (err, result) {
             if (err) throw err;
             for (let i = 0; i < result.length; i++) {
               console.log(`${result[i].first_name} ${result[i].last_name}`);
@@ -359,17 +359,17 @@ function view() {
         type: "list",
         message:
           "Which department would you like to view the total utilized budget",
-        choices: departmentChoices
+        choices: departmentChoices,
       })
-      .then(function(answer) {
+      .then(function (answer) {
         connection.query(
-          "SELECT * FROM role WHERE department_id='?'",
+          "SELECT SUM(role.salary) as total, department.name as name FROM ((role INNER JOIN employee ON role.id = employee.role_id) INNER JOIN department ON role.department_id = department.id) WHERE department.id = ? GROUP BY department.id",
           answer.action,
-          function(err, result) {
+          function (err, result) {
             if (err) throw err;
-            for (let i = 0; i < result.length; i++) {
-              console.log(result[i].salary);
-            }
+            console.log(
+              `${result[0].name} Department Total Salary: $${result[0].total}`
+            );
           }
         );
       });
@@ -383,9 +383,9 @@ function update() {
       name: "action",
       type: "rawlist",
       message: "What would you like to update?",
-      choices: ["Employee's role", "Employee's manager"]
+      choices: ["Employee's role", "Employee's manager"],
     })
-    .then(function(answer) {
+    .then(function (answer) {
       switch (answer.action) {
         case "Employee's role":
           updateEmployeesRole();
@@ -410,20 +410,20 @@ function update() {
         name: "action",
         type: "list",
         message: "Which employee would you like to update",
-        choices: Choices
+        choices: Choices,
       },
       {
         name: "newRole",
         type: "list",
         message: "What's the employee's new role",
-        choices: myRoleChoices
-      }
+        choices: myRoleChoices,
+      },
     ]);
 
     connection.query(
       "UPDATE employee SET role_id ='?' WHERE id='?'",
       [answer.newRole, answer.action],
-      function(err, result) {
+      function (err, result) {
         if (err) throw err;
         console.log(`${answer.action} was updated..`);
       }
@@ -443,20 +443,20 @@ function update() {
         name: "action",
         type: "list",
         message: "Which employee would you like to update",
-        choices: Choices
+        choices: Choices,
       },
       {
         name: "newManager",
         type: "list",
         message: "What's the employee's new manager",
-        choices: myManagerChoices
-      }
+        choices: myManagerChoices,
+      },
     ]);
 
     connection.query(
       "UPDATE employee SET superviserORmanager_id ='?' WHERE id='?'",
       [answer.newManager, answer.action],
-      function(err, result) {
+      function (err, result) {
         if (err) throw err;
         console.log(`${answer.action} was updated..`);
       }
@@ -471,9 +471,9 @@ function toDelete() {
       name: "action",
       type: "rawlist",
       message: "What would you like to delete?",
-      choices: ["Departments", "Roles", "Employees"]
+      choices: ["Departments", "Roles", "Employees"],
     })
-    .then(function(answer) {
+    .then(function (answer) {
       switch (answer.action) {
         case "Departments":
           deleteDepartments();
@@ -499,13 +499,13 @@ function toDelete() {
         name: "action",
         type: "list",
         message: "Which department would you like to delete",
-        choices: listOfDepartments
+        choices: listOfDepartments,
       })
-      .then(function(answer) {
+      .then(function (answer) {
         connection.query(
           "DELETE FROM department WHERE id='?'",
           answer.action,
-          function(err, result) {
+          function (err, result) {
             if (err) throw err;
             console.log(`${answer.action} was deleted..`);
           }
@@ -523,13 +523,13 @@ function toDelete() {
         name: "action",
         type: "list",
         message: "Which role would you like to delete",
-        choices: myRoleChoices
+        choices: myRoleChoices,
       })
-      .then(function(answer) {
+      .then(function (answer) {
         connection.query(
           "DELETE FROM role WHERE id='?'",
           answer.action,
-          function(err, result) {
+          function (err, result) {
             if (err) throw err;
             console.log(`deleted..`);
           }
@@ -547,13 +547,13 @@ function toDelete() {
         name: "action",
         type: "list",
         message: "Which employee would you like to delete",
-        choices: Choices
+        choices: Choices,
       })
-      .then(function(answer) {
+      .then(function (answer) {
         connection.query(
           "DELETE FROM employee WHERE id='?'",
           answer.action,
-          function(err, result) {
+          function (err, result) {
             if (err) throw err;
             console.log(`deleted..`);
           }
@@ -562,3 +562,8 @@ function toDelete() {
       });
   }
 }
+
+// SELECT employee.id, role.id, role.title, salary, department.name
+// FROM ((role
+// INNER JOIN employee ON role.id = employee.role_id)
+// INNER JOIN department ON role.department_id = department.id);
