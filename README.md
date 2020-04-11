@@ -10,7 +10,7 @@ As a web developer, I want a deployed portfolio that can showcase my work to pot
 
 <strong>Programs used</strong>
 
-I used HTML, CSS, Javascript, jquery, node.js, mysql and of course Git/Github were used as version control.
+I used Javascript, jquery, node.js, mysql and of course Git/Github were used as version control.
 
 <strong>Installation</strong>
 
